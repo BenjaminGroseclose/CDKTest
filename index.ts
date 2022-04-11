@@ -18,6 +18,4 @@ mockS3.hasWebsiteConfiguration(new MockWebsiteConfiguration(
 
 mockS3.hasVersioningConfiguration({ status: "Enabled" })
 
-console.log('here');
-
 mockS3.verify(resources);

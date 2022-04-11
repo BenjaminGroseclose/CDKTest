@@ -1,4 +1,4 @@
-
+import { red, green } from 'colors'
 
 const S3_TYPE = "AWS::S3::Bucket";
 const S3_BUCKET_TYPE = "AWS::S3::BucketPolicy";
@@ -38,27 +38,28 @@ export class MockS3 {
     }
 
     const properties = s3Bucket.Properties;
+    require('colors');
 
     if (this.bucketName !== properties.BucketName) {
-      console.log(`Error- BucketName '${this.bucketName}' does not match the CDK value`.red);
+      console.log(`Error: BucketName '${this.bucketName}' does not match the CDK value`.red);
       return false;
     }
 
     if (this.websiteConfiguration !== undefined) {
       if (this.websiteConfiguration.indexDocument !== properties.WebsiteConfiguration.IndexDocument) {
-        console.log(`Error- WebsiteConfiguration.IndexDocument: ${this.websiteConfiguration.indexDocument} does not match the CDK value`.red);
+        console.log(`Error: WebsiteConfiguration.IndexDocument ${this.websiteConfiguration.indexDocument} does not match the CDK value`.red);
         return false;
       }
     }
 
     if (this.versionConfiguration !== undefined) {
       if (this.versionConfiguration.status !== properties.VersioningConfiguration.Status) {
-        console.log(`Error- VersioningConfiguration.Status: ${this.versionConfiguration.status} does not match the CDK value`.red);
+        console.log(`Error: VersioningConfiguration.Status ${this.versionConfiguration.status} does not match the CDK value`.red);
         return false;
       }
     }
 
-    console.log(colors.red`Successful verified S3 bucket: ${this.bucketName}.`)
+    console.log(`Successful verified S3 bucket: ${this.bucketName}.`.green);
     return true;
   }
 };
