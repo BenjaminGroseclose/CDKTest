@@ -59,7 +59,7 @@ export class MockS3 {
       }
     }
 
-    console.log(`Successful verified S3 bucket: ${this.bucketName}.`.green);
+    console.log(`Successful verified ${S3_TYPE}: '${this.bucketName}'`.green);
     return true;
   }
 };

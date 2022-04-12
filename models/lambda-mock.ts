@@ -4,21 +4,40 @@ const LAMBDA_TYPE = "AWS::Lambda::Function";
 
 export class MockLambda {
 
-  code: MockCode;
-  runtime?: string;
-  name?: string;
-  memory?: number;
+  private runtime?: string;
+  private memory?: number;
+  private timeout?: number;
+  private desc?: string;
+  private envVar?: { [key: string]: string };
 
   constructor(
-    code: MockCode,
-    name: string,
-    runtime?: string,
-    memory?: number
-  ) {
-    this.code = code;
-    this.name = name;
+    private code: MockCode,
+    private name: string,
+  ) { }
+
+  withRuntime(runtime: string): MockLambda {
     this.runtime = runtime;
+    return this;
+  }
+
+  withMemory(memory: number): MockLambda {
     this.memory = memory;
+    return this;
+  }
+
+  withTimeout(timeout: number): MockLambda {
+    this.timeout = timeout;
+    return this;
+  }
+
+  withDescription(desc: string): MockLambda {
+    this.desc = desc
+    return this;
+  }
+
+  withEnvironmentVariables(envVar: { [key: string]: string }): MockLambda {
+    this.envVar = envVar;
+    return this;
   }
 
   verify(resources: any): boolean {
@@ -28,7 +47,7 @@ export class MockLambda {
       if (resources.hasOwnProperty(key)) {
         var value = resources[key];
 
-        if (value.Type === LAMBDA_TYPE) {
+        if (value.Type === LAMBDA_TYPE && value.Properties.FunctionName == this.name) {
           lambda = value;
         }
       }
@@ -37,28 +56,46 @@ export class MockLambda {
     const properties = lambda.Properties;
     require('colors');
 
-    // TODO Code:
-
-
     if (this.name && this.name !== properties.FunctionName) {
       console.log(`Error: FunctionName '${this.name}' does not match the CDK value`.red);
       return false;
     }
 
-    if (this.runtime && this.runtime !== properties.RunTime) {
+    if (this.runtime && this.runtime !== properties.Runtime) {
       console.log(`Error: Runtime: '${this.runtime}' does not match the cdk value`.red);
       return false;
     }
 
     if (this.memory && this.memory !== properties.MemorySize) {
       console.log(`Error: MemorySize '${this.memory}' does not matc CDK value`.red);
+      return false;
     }
 
-    if (this.name) {
-      console.log(`Successful verified Lambda: ${this.name}.`.green);
-    } else {
-      console.log(`Successful verified Lambda`.green);
+    if (this.timeout && this.timeout !== properties.Timeout) {
+      console.log(`Error: Timeout '${this.timeout}' does not matc CDK value`.red);
+      return false;
     }
+
+    if (this.desc && this.desc !== properties.Description) {
+      console.log(`Error: Description '${this.desc}' does not match CDK value`.red)
+      return false;
+    }
+
+    if (this.envVar) {
+      let failed = false;
+      for (let key in this.envVar) {
+        if (this.envVar[key] !== properties.Environment.Variables[key]) {
+          console.log(`Error: Envionment Variable: ${key} does not match or can not be found`.red)
+          failed = true;
+        }
+      }
+
+      if (failed) {
+        return false;
+      }
+    }
+
+    console.log(`Successful verified ${LAMBDA_TYPE}: '${this.name}'`.green);
     return true;
   }
 
