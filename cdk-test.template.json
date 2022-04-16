@@ -1,638 +1,744 @@
 {
   "Resources": {
-    "bengroseclosewebsitehostedzoneA3A8C24C": {
-      "Type": "AWS::Route53::HostedZone",
-      "Properties": {
-        "HostedZoneConfig": {
-          "Comment": "bengroseclose.com hosted zone"
-        },
-        "Name": "bengroseclose.com."
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-hosted-zone/Resource"
-      }
+   "bengroseclosewebsitehostedzoneA3A8C24C": {
+    "Type": "AWS::Route53::HostedZone",
+    "Properties": {
+     "HostedZoneConfig": {
+      "Comment": "bengroseclose.com hosted zone"
+     },
+     "Name": "bengroseclose.com."
     },
-    "bengroseclosewebsitecertCF7E3B26": {
-      "Type": "AWS::CertificateManager::Certificate",
-      "Properties": {
-        "DomainName": "bengroseclose.com",
-        "DomainValidationOptions": [
-          {
-            "DomainName": "bengroseclose.com",
-            "HostedZoneId": {
-              "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
-            }
-          },
-          {
-            "DomainName": "www.bengroseclose.com",
-            "HostedZoneId": {
-              "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
-            }
-          }
-        ],
-        "SubjectAlternativeNames": [
-          "www.bengroseclose.com"
-        ],
-        "ValidationMethod": "DNS"
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-cert/Resource"
-      }
-    },
-    "bengroseclosewebsitereactbucket4E2FA5A9": {
-      "Type": "AWS::S3::Bucket",
-      "Properties": {
-        "BucketName": "bengroseclose.com",
-        "Tags": [
-          {
-            "Key": "aws-cdk:cr-owned:ab2576a7",
-            "Value": "true"
-          }
-        ],
-        "VersioningConfiguration": {
-          "Status": "Enabled"
-        },
-        "WebsiteConfiguration": {
-          "IndexDocument": "index.html",
-          "RoutingRules": [
-            {
-              "RedirectRule": {
-                "HostName": "bengroseclose.com",
-                "ReplaceKeyPrefixWith": "#/"
-              },
-              "RoutingRuleCondition": {
-                "HttpErrorCodeReturnedEquals": "404"
-              }
-            },
-            {
-              "RedirectRule": {
-                "HostName": "bengroseclose.com",
-                "ReplaceKeyPrefixWith": "#/"
-              },
-              "RoutingRuleCondition": {
-                "HttpErrorCodeReturnedEquals": "403"
-              }
-            }
-          ]
-        }
-      },
-      "UpdateReplacePolicy": "Delete",
-      "DeletionPolicy": "Delete",
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-react-bucket/Resource"
-      }
-    },
-    "bengroseclosewebsitereactbucketPolicy838BC47F": {
-      "Type": "AWS::S3::BucketPolicy",
-      "Properties": {
-        "Bucket": {
-          "Ref": "bengroseclosewebsitereactbucket4E2FA5A9"
-        },
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": "s3:GetObject",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": "*"
-              },
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    {
-                      "Fn::GetAtt": [
-                        "bengroseclosewebsitereactbucket4E2FA5A9",
-                        "Arn"
-                      ]
-                    },
-                    "/*"
-                  ]
-                ]
-              }
-            },
-            {
-              "Action": "s3:GetObject",
-              "Effect": "Allow",
-              "Principal": {
-                "CanonicalUser": {
-                  "Fn::GetAtt": [
-                    "bengroseclosewebsiteoai45F3112B",
-                    "S3CanonicalUserId"
-                  ]
-                }
-              },
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    {
-                      "Fn::GetAtt": [
-                        "bengroseclosewebsitereactbucket4E2FA5A9",
-                        "Arn"
-                      ]
-                    },
-                    "/*"
-                  ]
-                ]
-              }
-            },
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "CanonicalUser": {
-                  "Fn::GetAtt": [
-                    "bengroseclosewebsiteoai45F3112B",
-                    "S3CanonicalUserId"
-                  ]
-                }
-              },
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "bengroseclosewebsitereactbucket4E2FA5A9",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "bengroseclosewebsitereactbucket4E2FA5A9",
-                          "Arn"
-                        ]
-                      },
-                      "/*"
-                    ]
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-react-bucket/Policy/Resource"
-      }
-    },
-    "bengroseclosewebsiteoai45F3112B": {
-      "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
-      "Properties": {
-        "CloudFrontOriginAccessIdentityConfig": {
-          "Comment": "Allows CloudFront to reach the bucket"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-oai/Resource"
-      }
-    },
-    "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE": {
-      "Type": "AWS::CloudFront::Distribution",
-      "Properties": {
-        "DistributionConfig": {
-          "Aliases": [
-            "www.bengroseclose.com",
-            "bengroseclose.com"
-          ],
-          "CustomErrorResponses": [
-            {
-              "ErrorCachingMinTTL": 10,
-              "ErrorCode": 404,
-              "ResponseCode": 200,
-              "ResponsePagePath": "/index.html"
-            }
-          ],
-          "DefaultCacheBehavior": {
-            "AllowedMethods": [
-              "GET",
-              "HEAD"
-            ],
-            "CachedMethods": [
-              "GET",
-              "HEAD"
-            ],
-            "Compress": true,
-            "ForwardedValues": {
-              "Cookies": {
-                "Forward": "none"
-              },
-              "QueryString": false
-            },
-            "TargetOriginId": "origin1",
-            "ViewerProtocolPolicy": "redirect-to-https"
-          },
-          "DefaultRootObject": "index.html",
-          "Enabled": true,
-          "HttpVersion": "http2",
-          "IPV6Enabled": true,
-          "Origins": [
-            {
-              "ConnectionAttempts": 3,
-              "ConnectionTimeout": 10,
-              "DomainName": {
-                "Fn::GetAtt": [
-                  "bengroseclosewebsitereactbucket4E2FA5A9",
-                  "RegionalDomainName"
-                ]
-              },
-              "Id": "origin1",
-              "S3OriginConfig": {
-                "OriginAccessIdentity": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "origin-access-identity/cloudfront/",
-                      {
-                        "Ref": "bengroseclosewebsiteoai45F3112B"
-                      }
-                    ]
-                  ]
-                }
-              }
-            }
-          ],
-          "PriceClass": "PriceClass_100",
-          "ViewerCertificate": {
-            "AcmCertificateArn": {
-              "Ref": "bengroseclosewebsitecertCF7E3B26"
-            },
-            "SslSupportMethod": "sni-only"
-          }
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-cloudfront/CFDistribution"
-      }
-    },
-    "bengroseclosewebsitebucketdeploymentAwsCliLayerF7F9A1CA": {
-      "Type": "AWS::Lambda::LayerVersion",
-      "Properties": {
-        "Content": {
-          "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
-          "S3Key": "92c405c4551a308bcdd55823f8b16268bd3c38fd2a011edaaf3ed72a80f557c4.zip"
-        },
-        "Description": "/opt/awscli/aws"
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-bucket-deployment/AwsCliLayer/Resource",
-        "aws:asset:path": "..\\asset.92c405c4551a308bcdd55823f8b16268bd3c38fd2a011edaaf3ed72a80f557c4.zip",
-        "aws:asset:is-bundled": false,
-        "aws:asset:property": "Content"
-      }
-    },
-    "bengroseclosewebsitebucketdeploymentCustomResourceAACBEC43": {
-      "Type": "Custom::CDKBucketDeployment",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
-            "Arn"
-          ]
-        },
-        "SourceBucketNames": [
-          "cdk-hnb659fds-assets-349097218527-us-east-1"
-        ],
-        "SourceObjectKeys": [
-          "993e83073163b3f5f0c90e630f7b96231e3749b6cf4d64213f11488003776508.zip"
-        ],
-        "DestinationBucketName": {
-          "Ref": "bengroseclosewebsitereactbucket4E2FA5A9"
-        },
-        "Prune": true,
-        "DistributionId": {
-          "Ref": "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE"
-        }
-      },
-      "UpdateReplacePolicy": "Delete",
-      "DeletionPolicy": "Delete",
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-bucket-deployment/CustomResource/Default"
-      }
-    },
-    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition"
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-              ]
-            ]
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource"
-      }
-    },
-    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF": {
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":s3:::cdk-hnb659fds-assets-349097218527-us-east-1"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":s3:::cdk-hnb659fds-assets-349097218527-us-east-1/*"
-                    ]
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*",
-                "s3:DeleteObject*",
-                "s3:PutObject",
-                "s3:PutObjectLegalHold",
-                "s3:PutObjectRetention",
-                "s3:PutObjectTagging",
-                "s3:PutObjectVersionTagging",
-                "s3:Abort*"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "bengroseclosewebsitereactbucket4E2FA5A9",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "bengroseclosewebsitereactbucket4E2FA5A9",
-                          "Arn"
-                        ]
-                      },
-                      "/*"
-                    ]
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "cloudfront:GetInvalidation",
-                "cloudfront:CreateInvalidation"
-              ],
-              "Effect": "Allow",
-              "Resource": "*"
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "PolicyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
-        "Roles": [
-          {
-            "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource"
-      }
-    },
-    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
-          "S3Key": "f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da.zip"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
-            "Arn"
-          ]
-        },
-        "Handler": "index.handler",
-        "Layers": [
-          {
-            "Ref": "bengroseclosewebsitebucketdeploymentAwsCliLayerF7F9A1CA"
-          }
-        ],
-        "Runtime": "python3.7",
-        "Timeout": 900
-      },
-      "DependsOn": [
-        "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
-        "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
-      ],
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
-        "aws:asset:path": "..\\asset.f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da",
-        "aws:asset:is-bundled": false,
-        "aws:asset:property": "Code"
-      }
-    },
-    "bengroseclosewebsitearecord5D4C1973": {
-      "Type": "AWS::Route53::RecordSet",
-      "Properties": {
-        "Name": "bengroseclose.com.",
-        "Type": "A",
-        "AliasTarget": {
-          "DNSName": {
-            "Fn::GetAtt": [
-              "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE",
-              "DomainName"
-            ]
-          },
-          "HostedZoneId": {
-            "Fn::FindInMap": [
-              "AWSCloudFrontPartitionHostedZoneIdMap",
-              {
-                "Ref": "AWS::Partition"
-              },
-              "zoneId"
-            ]
-          }
-        },
-        "HostedZoneId": {
-          "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
-        }
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-arecord/Resource"
-      }
-    },
-    "testServiceRole78466FFF": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition"
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-              ]
-            ]
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/test/ServiceRole/Resource"
-      }
-    },
-    "testAF53AC38": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
-          "S3Key": "0a6bc6fd56d74a54725cc85b9c0042436edff05ad87204b511a49dcfa1d0e947.zip"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "testServiceRole78466FFF",
-            "Arn"
-          ]
-        },
-        "Description": "CDKTest example function",
-        "Environment": {
-          "Variables": {
-            "BEN_TEST": "test env var",
-            "BEN_TEST_2": "super secret password"
-          }
-        },
-        "FunctionName": "bentest",
-        "Handler": "test.handler",
-        "Runtime": "python3.9",
-        "Timeout": 120
-      },
-      "DependsOn": [
-        "testServiceRole78466FFF"
-      ],
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/test/Resource",
-        "aws:asset:path": "..\\asset.0a6bc6fd56d74a54725cc85b9c0042436edff05ad87204b511a49dcfa1d0e947",
-        "aws:asset:is-bundled": false,
-        "aws:asset:property": "Code"
-      }
-    },
-    "CDKMetadata": {
-      "Type": "AWS::CDK::Metadata",
-      "Properties": {
-        "Analytics": "v2:deflate64:H4sIAAAAAAAA/21Ry2rDMBD8ltwVNSTtoUfHIbTQ0uBAC70YWV67W8tSkFYEY/zvlew8fOhpZ0azmtVqzdcrvlqIs1vKslkqLHh/JCEbFqS8t8YTPG14f/CFQvliHEH5bTSwtNIzlmQgjS2jOqEj0MAkWMIKpSBohRY1WN6ndy26Z3RgLgRtvWyA4tEFTeVgQnx3ly98IlvhQrdUxpeVNZp4/2GxRp1ICc69lqAJaWxOo2cfPf87bsdfUOzQkcXCExode+c8zpr3JZyU6drQzKdBdjeBCeeAHE9iGZgSbVGK8PpKv4kO7CdYF689oq4VkNF7r+UYdAPBesUDQ9HyPjNq3NlY7wuZ0HANyVUMyMP3SYU8ObtU4ZjJxlnC54Z31yz1jkybgTPeyunaGX4Xp1NwDezQ0Y/RDxv+zB8Xvw5xaX3YVQs8m+of5As/jUECAAA="
-      },
-      "Metadata": {
-        "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/CDKMetadata/Default"
-      }
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-hosted-zone/Resource"
     }
+   },
+   "bengroseclosewebsitecertCF7E3B26": {
+    "Type": "AWS::CertificateManager::Certificate",
+    "Properties": {
+     "DomainName": "bengroseclose.com",
+     "DomainValidationOptions": [
+      {
+       "DomainName": "bengroseclose.com",
+       "HostedZoneId": {
+        "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
+       }
+      },
+      {
+       "DomainName": "www.bengroseclose.com",
+       "HostedZoneId": {
+        "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
+       }
+      }
+     ],
+     "SubjectAlternativeNames": [
+      "www.bengroseclose.com"
+     ],
+     "ValidationMethod": "DNS"
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-cert/Resource"
+    }
+   },
+   "bengroseclosewebsitereactbucket4E2FA5A9": {
+    "Type": "AWS::S3::Bucket",
+    "Properties": {
+     "BucketName": "bengroseclose.com",
+     "Tags": [
+      {
+       "Key": "aws-cdk:cr-owned:ab2576a7",
+       "Value": "true"
+      }
+     ],
+     "VersioningConfiguration": {
+      "Status": "Enabled"
+     },
+     "WebsiteConfiguration": {
+      "IndexDocument": "index.html",
+      "RoutingRules": [
+       {
+        "RedirectRule": {
+         "HostName": "bengroseclose.com",
+         "ReplaceKeyPrefixWith": "#/"
+        },
+        "RoutingRuleCondition": {
+         "HttpErrorCodeReturnedEquals": "404"
+        }
+       },
+       {
+        "RedirectRule": {
+         "HostName": "bengroseclose.com",
+         "ReplaceKeyPrefixWith": "#/"
+        },
+        "RoutingRuleCondition": {
+         "HttpErrorCodeReturnedEquals": "403"
+        }
+       }
+      ]
+     }
+    },
+    "UpdateReplacePolicy": "Delete",
+    "DeletionPolicy": "Delete",
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-react-bucket/Resource"
+    }
+   },
+   "bengroseclosewebsitereactbucketPolicy838BC47F": {
+    "Type": "AWS::S3::BucketPolicy",
+    "Properties": {
+     "Bucket": {
+      "Ref": "bengroseclosewebsitereactbucket4E2FA5A9"
+     },
+     "PolicyDocument": {
+      "Statement": [
+       {
+        "Action": "s3:GetObject",
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Resource": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "bengroseclosewebsitereactbucket4E2FA5A9",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       },
+       {
+        "Action": "s3:GetObject",
+        "Effect": "Allow",
+        "Principal": {
+         "CanonicalUser": {
+          "Fn::GetAtt": [
+           "bengroseclosewebsiteoai45F3112B",
+           "S3CanonicalUserId"
+          ]
+         }
+        },
+        "Resource": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "bengroseclosewebsitereactbucket4E2FA5A9",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       },
+       {
+        "Action": [
+         "s3:GetObject*",
+         "s3:GetBucket*",
+         "s3:List*"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+         "CanonicalUser": {
+          "Fn::GetAtt": [
+           "bengroseclosewebsiteoai45F3112B",
+           "S3CanonicalUserId"
+          ]
+         }
+        },
+        "Resource": [
+         {
+          "Fn::GetAtt": [
+           "bengroseclosewebsitereactbucket4E2FA5A9",
+           "Arn"
+          ]
+         },
+         {
+          "Fn::Join": [
+           "",
+           [
+            {
+             "Fn::GetAtt": [
+              "bengroseclosewebsitereactbucket4E2FA5A9",
+              "Arn"
+             ]
+            },
+            "/*"
+           ]
+          ]
+         }
+        ]
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-react-bucket/Policy/Resource"
+    }
+   },
+   "bengroseclosewebsiteoai45F3112B": {
+    "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+    "Properties": {
+     "CloudFrontOriginAccessIdentityConfig": {
+      "Comment": "Allows CloudFront to reach the bucket"
+     }
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-oai/Resource"
+    }
+   },
+   "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE": {
+    "Type": "AWS::CloudFront::Distribution",
+    "Properties": {
+     "DistributionConfig": {
+      "Aliases": [
+       "www.bengroseclose.com",
+       "bengroseclose.com"
+      ],
+      "CustomErrorResponses": [
+       {
+        "ErrorCachingMinTTL": 10,
+        "ErrorCode": 404,
+        "ResponseCode": 200,
+        "ResponsePagePath": "/index.html"
+       }
+      ],
+      "DefaultCacheBehavior": {
+       "AllowedMethods": [
+        "GET",
+        "HEAD"
+       ],
+       "CachedMethods": [
+        "GET",
+        "HEAD"
+       ],
+       "Compress": true,
+       "ForwardedValues": {
+        "Cookies": {
+         "Forward": "none"
+        },
+        "QueryString": false
+       },
+       "TargetOriginId": "origin1",
+       "ViewerProtocolPolicy": "redirect-to-https"
+      },
+      "DefaultRootObject": "index.html",
+      "Enabled": true,
+      "HttpVersion": "http2",
+      "IPV6Enabled": true,
+      "Origins": [
+       {
+        "ConnectionAttempts": 3,
+        "ConnectionTimeout": 10,
+        "DomainName": {
+         "Fn::GetAtt": [
+          "bengroseclosewebsitereactbucket4E2FA5A9",
+          "RegionalDomainName"
+         ]
+        },
+        "Id": "origin1",
+        "S3OriginConfig": {
+         "OriginAccessIdentity": {
+          "Fn::Join": [
+           "",
+           [
+            "origin-access-identity/cloudfront/",
+            {
+             "Ref": "bengroseclosewebsiteoai45F3112B"
+            }
+           ]
+          ]
+         }
+        }
+       }
+      ],
+      "PriceClass": "PriceClass_100",
+      "ViewerCertificate": {
+       "AcmCertificateArn": {
+        "Ref": "bengroseclosewebsitecertCF7E3B26"
+       },
+       "SslSupportMethod": "sni-only"
+      }
+     }
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-cloudfront/CFDistribution"
+    }
+   },
+   "bengroseclosewebsitebucketdeploymentAwsCliLayerF7F9A1CA": {
+    "Type": "AWS::Lambda::LayerVersion",
+    "Properties": {
+     "Content": {
+      "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
+      "S3Key": "92c405c4551a308bcdd55823f8b16268bd3c38fd2a011edaaf3ed72a80f557c4.zip"
+     },
+     "Description": "/opt/awscli/aws"
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-bucket-deployment/AwsCliLayer/Resource",
+     "aws:asset:path": "..\\asset.92c405c4551a308bcdd55823f8b16268bd3c38fd2a011edaaf3ed72a80f557c4.zip",
+     "aws:asset:is-bundled": false,
+     "aws:asset:property": "Content"
+    }
+   },
+   "bengroseclosewebsitebucketdeploymentCustomResourceAACBEC43": {
+    "Type": "Custom::CDKBucketDeployment",
+    "Properties": {
+     "ServiceToken": {
+      "Fn::GetAtt": [
+       "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+       "Arn"
+      ]
+     },
+     "SourceBucketNames": [
+      "cdk-hnb659fds-assets-349097218527-us-east-1"
+     ],
+     "SourceObjectKeys": [
+      "993e83073163b3f5f0c90e630f7b96231e3749b6cf4d64213f11488003776508.zip"
+     ],
+     "DestinationBucketName": {
+      "Ref": "bengroseclosewebsitereactbucket4E2FA5A9"
+     },
+     "Prune": true,
+     "DistributionId": {
+      "Ref": "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE"
+     }
+    },
+    "UpdateReplacePolicy": "Delete",
+    "DeletionPolicy": "Delete",
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-bucket-deployment/CustomResource/Default"
+    }
+   },
+   "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+     "AssumeRolePolicyDocument": {
+      "Statement": [
+       {
+        "Action": "sts:AssumeRole",
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     },
+     "ManagedPolicyArns": [
+      {
+       "Fn::Join": [
+        "",
+        [
+         "arn:",
+         {
+          "Ref": "AWS::Partition"
+         },
+         ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+       ]
+      }
+     ]
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource"
+    }
+   },
+   "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF": {
+    "Type": "AWS::IAM::Policy",
+    "Properties": {
+     "PolicyDocument": {
+      "Statement": [
+       {
+        "Action": [
+         "s3:GetObject*",
+         "s3:GetBucket*",
+         "s3:List*"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+         {
+          "Fn::Join": [
+           "",
+           [
+            "arn:",
+            {
+             "Ref": "AWS::Partition"
+            },
+            ":s3:::cdk-hnb659fds-assets-349097218527-us-east-1"
+           ]
+          ]
+         },
+         {
+          "Fn::Join": [
+           "",
+           [
+            "arn:",
+            {
+             "Ref": "AWS::Partition"
+            },
+            ":s3:::cdk-hnb659fds-assets-349097218527-us-east-1/*"
+           ]
+          ]
+         }
+        ]
+       },
+       {
+        "Action": [
+         "s3:GetObject*",
+         "s3:GetBucket*",
+         "s3:List*",
+         "s3:DeleteObject*",
+         "s3:PutObject",
+         "s3:PutObjectLegalHold",
+         "s3:PutObjectRetention",
+         "s3:PutObjectTagging",
+         "s3:PutObjectVersionTagging",
+         "s3:Abort*"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+         {
+          "Fn::GetAtt": [
+           "bengroseclosewebsitereactbucket4E2FA5A9",
+           "Arn"
+          ]
+         },
+         {
+          "Fn::Join": [
+           "",
+           [
+            {
+             "Fn::GetAtt": [
+              "bengroseclosewebsitereactbucket4E2FA5A9",
+              "Arn"
+             ]
+            },
+            "/*"
+           ]
+          ]
+         }
+        ]
+       },
+       {
+        "Action": [
+         "cloudfront:GetInvalidation",
+         "cloudfront:CreateInvalidation"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     },
+     "PolicyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+     "Roles": [
+      {
+       "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+      }
+     ]
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource"
+    }
+   },
+   "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
+    "Type": "AWS::Lambda::Function",
+    "Properties": {
+     "Code": {
+      "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
+      "S3Key": "f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da.zip"
+     },
+     "Role": {
+      "Fn::GetAtt": [
+       "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+       "Arn"
+      ]
+     },
+     "Handler": "index.handler",
+     "Layers": [
+      {
+       "Ref": "bengroseclosewebsitebucketdeploymentAwsCliLayerF7F9A1CA"
+      }
+     ],
+     "Runtime": "python3.7",
+     "Timeout": 900
+    },
+    "DependsOn": [
+     "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+     "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+    ],
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
+     "aws:asset:path": "..\\asset.f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da",
+     "aws:asset:is-bundled": false,
+     "aws:asset:property": "Code"
+    }
+   },
+   "bengroseclosewebsitearecord5D4C1973": {
+    "Type": "AWS::Route53::RecordSet",
+    "Properties": {
+     "Name": "bengroseclose.com.",
+     "Type": "A",
+     "AliasTarget": {
+      "DNSName": {
+       "Fn::GetAtt": [
+        "bengroseclosewebsitecloudfrontCFDistribution5E57D3EE",
+        "DomainName"
+       ]
+      },
+      "HostedZoneId": {
+       "Fn::FindInMap": [
+        "AWSCloudFrontPartitionHostedZoneIdMap",
+        {
+         "Ref": "AWS::Partition"
+        },
+        "zoneId"
+       ]
+      }
+     },
+     "HostedZoneId": {
+      "Ref": "bengroseclosewebsitehostedzoneA3A8C24C"
+     }
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ben-groseclose-website-arecord/Resource"
+    }
+   },
+   "lambdatestServiceRoleB1741B4B": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+     "AssumeRolePolicyDocument": {
+      "Statement": [
+       {
+        "Action": "sts:AssumeRole",
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     },
+     "ManagedPolicyArns": [
+      {
+       "Fn::Join": [
+        "",
+        [
+         "arn:",
+         {
+          "Ref": "AWS::Partition"
+         },
+         ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+       ]
+      }
+     ]
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/lambda-test/ServiceRole/Resource"
+    }
+   },
+   "lambdatest24D5709C": {
+    "Type": "AWS::Lambda::Function",
+    "Properties": {
+     "Code": {
+      "S3Bucket": "cdk-hnb659fds-assets-349097218527-us-east-1",
+      "S3Key": "a75d8cb501d7dd92073367771e2d8d76d1f0b06ab472f86356c214a231bcdfd9.zip"
+     },
+     "Role": {
+      "Fn::GetAtt": [
+       "lambdatestServiceRoleB1741B4B",
+       "Arn"
+      ]
+     },
+     "Description": "CDKTest example function",
+     "Environment": {
+      "Variables": {
+       "BEN_TEST": "test env var",
+       "BEN_TEST_2": "super secret password"
+      }
+     },
+     "FunctionName": "bentest",
+     "Handler": "test.handler",
+     "Runtime": "python3.9",
+     "Timeout": 120
+    },
+    "DependsOn": [
+     "lambdatestServiceRoleB1741B4B"
+    ],
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/lambda-test/Resource",
+     "aws:asset:path": "..\\asset.a75d8cb501d7dd92073367771e2d8d76d1f0b06ab472f86356c214a231bcdfd9",
+     "aws:asset:is-bundled": false,
+     "aws:asset:property": "Code"
+    }
+   },
+   "ec2testInstanceSecurityGroupD8B4B470": {
+    "Type": "AWS::EC2::SecurityGroup",
+    "Properties": {
+     "GroupDescription": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ec2-test/InstanceSecurityGroup",
+     "SecurityGroupEgress": [
+      {
+       "CidrIp": "255.255.255.255/32",
+       "Description": "Disallow all traffic",
+       "FromPort": 252,
+       "IpProtocol": "icmp",
+       "ToPort": 86
+      }
+     ],
+     "Tags": [
+      {
+       "Key": "Name",
+       "Value": "bentest"
+      }
+     ],
+     "VpcId": "vpc-071f42e94e6735ea7"
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ec2-test/InstanceSecurityGroup/Resource"
+    }
+   },
+   "ec2testInstanceRoleB133D330": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+     "AssumeRolePolicyDocument": {
+      "Statement": [
+       {
+        "Action": "sts:AssumeRole",
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "ec2.amazonaws.com"
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     },
+     "Tags": [
+      {
+       "Key": "Name",
+       "Value": "bentest"
+      }
+     ]
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ec2-test/InstanceRole/Resource"
+    }
+   },
+   "ec2testInstanceProfileDB1827FF": {
+    "Type": "AWS::IAM::InstanceProfile",
+    "Properties": {
+     "Roles": [
+      {
+       "Ref": "ec2testInstanceRoleB133D330"
+      }
+     ]
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ec2-test/InstanceProfile"
+    }
+   },
+   "ec2testFFF8776E": {
+    "Type": "AWS::EC2::Instance",
+    "Properties": {
+     "AvailabilityZone": "us-east-1a",
+     "IamInstanceProfile": {
+      "Ref": "ec2testInstanceProfileDB1827FF"
+     },
+     "ImageId": {
+      "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
+     },
+     "InstanceType": "m5.small",
+     "Monitoring": true,
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "ec2testInstanceSecurityGroupD8B4B470",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetId": "subnet-055888cc790454b67",
+     "Tags": [
+      {
+       "Key": "Name",
+       "Value": "bentest"
+      }
+     ],
+     "UserData": {
+      "Fn::Base64": "#!/bin/bash"
+     }
+    },
+    "DependsOn": [
+     "ec2testInstanceRoleB133D330"
+    ],
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/ec2-test/Resource"
+    }
+   },
+   "CDKMetadata": {
+    "Type": "AWS::CDK::Metadata",
+    "Properties": {
+     "Analytics": "v2:deflate64:H4sIAAAAAAAA/21STWvDMAz9Lb27Xmm3w45pyrbCxkILG+wSHEfJtDp2sWVKCPnvs5N+BLaTnp6frCfZS75c8MVMnNxcloe5woJ3exLywAKVd9Z4gocV7zJfKJQvxhGUX0YDSys9yZIdSGPLyI5oD9QzCZawQikIGqFFDZZ36Y2L6knaMxcarb08AMWjMxpDZkL79kaf8zFZCxeqpTK+rKzRxLt3izXqREpwbluCJqShOI2ap6j5X3E9/oRig44sFp7Q6Fg7zaPXvCvhqEzbhGI+GtlcCSacA3I8iaFnSjRFKcL0lX4VLdgPsC5eu0ddKyCjn7yWQ6MrCNIL7hmKhnc7o4adDfG2kBvaakdCS8isqVCFlYBc8u7Csj1Ib8OYz+FVj1H/h7hI+4vjXEW3efgLUiFPTi5VOAzAhsHCTwlLrFnqHZlmB854K0ePE/wmjseomnKZsKIBAtuzrKVvo+9W/JHfz34c4tz68BwN8N0YfwGT3ZnapAIAAA=="
+    },
+    "Metadata": {
+     "aws:cdk:path": "deployment-pipeline/ApplicationStage/ben-groseclose-website/CDKMetadata/Default"
+    }
+   }
   },
   "Mappings": {
-    "AWSCloudFrontPartitionHostedZoneIdMap": {
-      "aws": {
-        "zoneId": "Z2FDTNDATAQYW2"
-      },
-      "aws-cn": {
-        "zoneId": "Z3RFFRIM2A3IF5"
-      }
+   "AWSCloudFrontPartitionHostedZoneIdMap": {
+    "aws": {
+     "zoneId": "Z2FDTNDATAQYW2"
+    },
+    "aws-cn": {
+     "zoneId": "Z3RFFRIM2A3IF5"
     }
+   }
   },
   "Parameters": {
-    "BootstrapVersion": {
-      "Type": "AWS::SSM::Parameter::Value<String>",
-      "Default": "/cdk-bootstrap/hnb659fds/version",
-      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
-    }
+   "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+    "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+    "Default": "/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2"
+   },
+   "BootstrapVersion": {
+    "Type": "AWS::SSM::Parameter::Value<String>",
+    "Default": "/cdk-bootstrap/hnb659fds/version",
+    "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+   }
   },
   "Rules": {
-    "CheckBootstrapVersion": {
-      "Assertions": [
+   "CheckBootstrapVersion": {
+    "Assertions": [
+     {
+      "Assert": {
+       "Fn::Not": [
         {
-          "Assert": {
-            "Fn::Not": [
-              {
-                "Fn::Contains": [
-                  [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5"
-                  ],
-                  {
-                    "Ref": "BootstrapVersion"
-                  }
-                ]
-              }
-            ]
-          },
-          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+         "Fn::Contains": [
+          [
+           "1",
+           "2",
+           "3",
+           "4",
+           "5"
+          ],
+          {
+           "Ref": "BootstrapVersion"
+          }
+         ]
         }
-      ]
-    }
+       ]
+      },
+      "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+     }
+    ]
+   }
   }
-}
+ }
