@@ -11,7 +11,7 @@ export class MockLambda {
   private envVar?: { [key: string]: string };
 
   constructor(
-    private code: MockCode,
+    private codeType: CodeType,
     private name: string,
   ) { }
 
@@ -40,8 +40,36 @@ export class MockLambda {
     return this;
   }
 
+  private verifyCodeType(properties: any): boolean {
+    let isValid = true;
+
+    switch (this.codeType) {
+      case CodeType.S3:
+        if (properties.Code.S3Bucket && properties.Code.S3Bucket === "") {
+          console.log(`Error: Expected CodeType: 'S3' but could not find any S3Bucket property`.red);
+          isValid = false;
+        }
+        break;
+      case CodeType.IMAGE_URI:
+        if (properties.Code.ImageUri && properties.Code.ImageUri === "") {
+          console.log(`Error: Expected CodeType: 'IMAGE_URI' but could not find any ImageUri property`.red);
+          isValid = false;
+        }
+        break;
+      case CodeType.ZIP_FILE:
+        if (properties.Code.ZipFile && properties.Code.ZipFile === "") {
+          console.log(`Error: Expected CodeType: 'ZIP_FILE' but could not find any ZipFile property`.red);
+          isValid = false;
+        }
+        break;
+    }
+
+    return isValid;
+  }
+
   verify(resources: any): boolean {
     let lambda;
+    let isValid = true;
 
     for (var key in resources) {
       if (resources.hasOwnProperty(key)) {
@@ -58,27 +86,27 @@ export class MockLambda {
 
     if (this.name && this.name !== properties.FunctionName) {
       console.log(`Error: FunctionName '${this.name}' does not match the CDK value`.red);
-      return false;
+      isValid = false;
     }
 
     if (this.runtime && this.runtime !== properties.Runtime) {
       console.log(`Error: Runtime: '${this.runtime}' does not match the cdk value`.red);
-      return false;
+      isValid = false;
     }
 
     if (this.memory && this.memory !== properties.MemorySize) {
       console.log(`Error: MemorySize '${this.memory}' does not matc CDK value`.red);
-      return false;
+      isValid = false;
     }
 
     if (this.timeout && this.timeout !== properties.Timeout) {
       console.log(`Error: Timeout '${this.timeout}' does not matc CDK value`.red);
-      return false;
+      isValid = false;
     }
 
     if (this.desc && this.desc !== properties.Description) {
       console.log(`Error: Description '${this.desc}' does not match CDK value`.red)
-      return false;
+      isValid = false;
     }
 
     if (this.envVar) {
@@ -91,36 +119,27 @@ export class MockLambda {
       }
 
       if (failed) {
-        return false;
+        isValid = false;
       }
     }
 
-    console.log(`Successful verified ${LAMBDA_TYPE}: '${this.name}'`.green);
-    return true;
+    isValid = this.verifyCodeType(properties);
+
+    if (isValid) {
+      console.log(`Successful verified ${LAMBDA_TYPE}: '${this.name}'`.green);
+    } else {
+      console.log('--------'.red);
+      console.log(`Failed to validate Lambda: ${this.name}`.red);
+      console.log('--------'.red);
+    }
+
+    return isValid;
   }
 
 };
 
-export class MockCode {
-
-  imageUri?: string
-  s3Bucket?: string
-  s3Key?: string
-  s3ObjectVersion?: string
-  zipFile?: string
-
-  constructor(
-    imageUri?: string,
-    s3Bucket?: string,
-    s3Key?: string,
-    s3ObjectVersion?: string,
-    zipFile?: string
-  ) {
-    this.imageUri = imageUri;
-    this.s3Bucket = s3Bucket;
-    this.s3Key = s3Key;
-    this.s3ObjectVersion = s3ObjectVersion;
-    this.zipFile = zipFile;
-  }
-
+export enum CodeType {
+  S3,
+  ZIP_FILE,
+  IMAGE_URI
 }

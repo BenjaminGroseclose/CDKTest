@@ -24,7 +24,7 @@ export class MockS3 {
 
   verify(resources: any) {
     let s3Bucket;
-    let bucketKey;
+    let isValid = true;
 
     for (var key in resources) {
       if (resources.hasOwnProperty(key)) {
@@ -32,7 +32,6 @@ export class MockS3 {
 
         if (value.Type === S3_TYPE) {
           s3Bucket = value;
-          bucketKey = key;
         }
       }
     }
@@ -42,25 +41,31 @@ export class MockS3 {
 
     if (this.bucketName !== properties.BucketName) {
       console.log(`Error: BucketName '${this.bucketName}' does not match the CDK value`.red);
-      return false;
+      isValid = false;
     }
 
-    if (this.websiteConfiguration !== undefined) {
-      if (this.websiteConfiguration.indexDocument !== properties.WebsiteConfiguration.IndexDocument) {
-        console.log(`Error: WebsiteConfiguration.IndexDocument ${this.websiteConfiguration.indexDocument} does not match the CDK value`.red);
-        return false;
-      }
+    if (this.websiteConfiguration && this.websiteConfiguration.indexDocument !== properties.WebsiteConfiguration.IndexDocument) {
+      console.log(`Error: WebsiteConfiguration.IndexDocument ${this.websiteConfiguration.indexDocument} does not match the CDK value`.red);
+      isValid = false;
     }
 
-    if (this.versionConfiguration !== undefined) {
-      if (this.versionConfiguration.status !== properties.VersioningConfiguration.Status) {
-        console.log(`Error: VersioningConfiguration.Status ${this.versionConfiguration.status} does not match the CDK value`.red);
-        return false;
-      }
+    if (this.versionConfiguration && this.versionConfiguration.status !== properties.VersioningConfiguration.Status) {
+      console.log(`Error: VersioningConfiguration.Status ${this.versionConfiguration.status} does not match the CDK value`.red);
+      isValid = false;
     }
 
-    console.log(`Successful verified ${S3_TYPE}: '${this.bucketName}'`.green);
-    return true;
+    // TODO Routing rules
+
+    if (isValid) {
+      console.log(`Successful verified ${S3_TYPE}: '${this.bucketName}'`.green);
+    } else {
+      console.log('--------'.red);
+      console.log(`Failed to validate Lambda: ${this.bucketName}`.red);
+      console.log('--------'.red);
+    }
+
+    
+    return isValid;
   }
 };
 

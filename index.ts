@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { MockCode, MockLambda } from './models/lambda-mock';
+import { CodeType, MockLambda } from './models/lambda-mock';
 import { MockS3, RoutingRule as MockRoutingRule, MockWebsiteConfiguration } from './models/s3-mock';
 
 let file = fs.readFileSync('cdk-test.template.json')
@@ -21,7 +21,7 @@ mockS3.hasVersioningConfiguration({ status: "Enabled" })
 
 mockS3.verify(resources);
 
-let mockLambda = new MockLambda(new MockCode(), 'bentest')
+let mockLambda = new MockLambda(CodeType.S3, 'bentest')
   .withTimeout(120)
   .withRuntime('python3.9')
   .withDescription('CDKTest example function')
