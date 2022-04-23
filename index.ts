@@ -7,6 +7,7 @@ let jsonParsed = JSON.parse(file.toString());
 
 const resources = jsonParsed.Resources;
 
+// Success Example
 let mockS3 = new MockS3("bengroseclose.com");
 
 mockS3.hasWebsiteConfiguration(new MockWebsiteConfiguration(
@@ -15,12 +16,13 @@ mockS3.hasWebsiteConfiguration(new MockWebsiteConfiguration(
     new MockRoutingRule({ hostName: "bengroseclose.com", replacePrefixWith: "#/" }, { httpErrorReturnCode: "404" }),
     new MockRoutingRule({ hostName: "bengroseclose.com", replacePrefixWith: "#/" }, { httpErrorReturnCode: "403" })
   ]
-))
+));
 
-mockS3.hasVersioningConfiguration({ status: "Enabled" })
+mockS3.hasVersioningConfiguration({ status: "Enabled" });
 
 mockS3.verify(resources);
 
+// Fail Example
 let mockLambda = new MockLambda(CodeType.S3, 'bentest')
   .withTimeout(120)
   .withRuntime('python3.9')
@@ -28,7 +30,8 @@ let mockLambda = new MockLambda(CodeType.S3, 'bentest')
 
 let environmentVariables: { [key: string]: string } = {};
 environmentVariables['BEN_TEST'] = "test env var";
-environmentVariables['BEN_TEST_2'] = "super secret password";
+environmentVariables['BEN_TEST_2'] = "super secret password1";
+environmentVariables['DATABASE'] = 'my_db';
 
 mockLambda.withEnvironmentVariables(environmentVariables);
 

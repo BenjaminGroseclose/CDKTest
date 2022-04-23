@@ -1,3 +1,4 @@
+import { fail } from 'assert';
 import { red, green } from 'colors';
 
 const LAMBDA_TYPE = "AWS::Lambda::Function";
@@ -8,12 +9,18 @@ export class MockLambda {
   private memory?: number;
   private timeout?: number;
   private desc?: string;
+  private handler?: string;
   private envVar?: { [key: string]: string };
 
   constructor(
     private codeType: CodeType,
     private name: string,
   ) { }
+
+  withHandler(handler: string): MockLambda {
+    this.handler = handler;
+    return this;
+  }
 
   withRuntime(runtime: string): MockLambda {
     this.runtime = runtime;
@@ -123,7 +130,9 @@ export class MockLambda {
       }
     }
 
-    isValid = this.verifyCodeType(properties);
+    if (!this.verifyCodeType(properties)) {
+      isValid = false;
+    }
 
     if (isValid) {
       console.log(`Successful verified ${LAMBDA_TYPE}: '${this.name}'`.green);
